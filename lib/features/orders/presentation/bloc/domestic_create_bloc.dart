@@ -470,11 +470,11 @@ class DomesticCreateBloc
   DomesticServiceType? _serviceTypeFromId(int? id) {
     switch (id) {
       case 1:
-        return DomesticServiceType.express;
-      case 2:
         return DomesticServiceType.sameDay;
-      case 3:
+      case 2:
         return DomesticServiceType.nextDay;
+      case 3:
+        return DomesticServiceType.express;
       default:
         return null;
     }
@@ -543,11 +543,11 @@ class DomesticCreateBloc
 
   int _mapServiceTypeId(DomesticServiceType type) {
     switch (type) {
-      case DomesticServiceType.express:
-        return 1;
       case DomesticServiceType.sameDay:
-        return 2;
+        return 1;
       case DomesticServiceType.nextDay:
+        return 2;
+      case DomesticServiceType.express:
         return 3;
     }
   }

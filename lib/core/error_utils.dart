@@ -1,5 +1,8 @@
 class ErrorUtils {
-  static String friendly(String raw, {String fallback = 'Something went wrong. Please try again.'}) {
+  static String friendly(
+    String raw, {
+    String fallback = 'Something went wrong. Please try again.',
+  }) {
     final clean = raw.replaceAll('Exception: ', '').trim();
     if (clean.isEmpty) return fallback;
     final lower = clean.toLowerCase();

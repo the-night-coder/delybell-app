@@ -23,6 +23,63 @@ class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
     on<SignUpConfirmPasswordVisibilityToggled>(
       _onConfirmPasswordVisibilityToggled,
     );
+    on<SignUpNationalityChanged>(
+      (event, emit) => emit(
+        state.copyWith(nationality: event.nationality, errorMessage: null),
+      ),
+    );
+    on<SignUpCityChanged>(
+      (event, emit) =>
+          emit(state.copyWith(city: event.city, errorMessage: null)),
+    );
+    on<SignUpRoadChanged>(
+      (event, emit) =>
+          emit(state.copyWith(road: event.road, errorMessage: null)),
+    );
+    on<SignUpBlockChanged>(
+      (event, emit) =>
+          emit(state.copyWith(block: event.block, errorMessage: null)),
+    );
+    on<SignUpBuildingChanged>(
+      (event, emit) =>
+          emit(state.copyWith(building: event.building, errorMessage: null)),
+    );
+    on<SignUpAddressLine1Changed>(
+      (event, emit) =>
+          emit(state.copyWith(addressLine1: event.address, errorMessage: null)),
+    );
+    on<SignUpAddressLine2Changed>(
+      (event, emit) =>
+          emit(state.copyWith(addressLine2: event.address, errorMessage: null)),
+    );
+    on<SignUpOrganizationNameChanged>(
+      (event, emit) => emit(
+        state.copyWith(organizationName: event.name, errorMessage: null),
+      ),
+    );
+    on<SignUpOrganizationRegNoChanged>(
+      (event, emit) => emit(
+        state.copyWith(organizationRegNo: event.regNo, errorMessage: null),
+      ),
+    );
+    on<SignUpVatNumberChanged>(
+      (event, emit) =>
+          emit(state.copyWith(vatNumber: event.vatNumber, errorMessage: null)),
+    );
+    on<SignUpFirstNameArChanged>(
+      (event, emit) =>
+          emit(state.copyWith(firstNameAr: event.name, errorMessage: null)),
+    );
+    on<SignUpLastNameArChanged>(
+      (event, emit) =>
+          emit(state.copyWith(lastNameAr: event.name, errorMessage: null)),
+    );
+    on<SignUpDescriptionChanged>(
+      (event, emit) => emit(
+        state.copyWith(description: event.description, errorMessage: null),
+      ),
+    );
+
     on<SignUpSubmitted>(_onSubmitted);
   }
 
@@ -121,11 +178,7 @@ class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
     SignUpPasswordVisibilityToggled event,
     Emitter<SignUpState> emit,
   ) {
-    emit(
-      state.copyWith(
-        isPasswordVisible: !state.isPasswordVisible,
-      ),
-    );
+    emit(state.copyWith(isPasswordVisible: !state.isPasswordVisible));
   }
 
   void _onConfirmPasswordVisibilityToggled(
@@ -133,9 +186,7 @@ class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
     Emitter<SignUpState> emit,
   ) {
     emit(
-      state.copyWith(
-        isConfirmPasswordVisible: !state.isConfirmPasswordVisible,
-      ),
+      state.copyWith(isConfirmPasswordVisible: !state.isConfirmPasswordVisible),
     );
   }
 
@@ -146,9 +197,7 @@ class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
     if (state.firstName.isEmpty ||
         state.lastName.isEmpty ||
         state.email.isEmpty ||
-        state.phoneNumber.isEmpty ||
-        state.password.isEmpty ||
-        state.confirmPassword.isEmpty) {
+        state.phoneNumber.isEmpty) {
       emit(
         state.copyWith(
           status: SignUpStatus.failure,
@@ -158,14 +207,16 @@ class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
       return;
     }
 
-    if (state.password != state.confirmPassword) {
-      emit(
-        state.copyWith(
-          status: SignUpStatus.failure,
-          errorMessage: 'Passwords do not match.',
-        ),
-      );
-      return;
+    if (state.signUpType == SignUpType.corporate) {
+      if (state.organizationName.isEmpty) {
+        emit(
+          state.copyWith(
+            status: SignUpStatus.failure,
+            errorMessage: 'Organization Name is required.',
+          ),
+        );
+        return;
+      }
     }
 
     emit(state.copyWith(status: SignUpStatus.loading, errorMessage: null));
@@ -180,6 +231,19 @@ class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
         password: state.password,
         confirmPassword: state.confirmPassword,
         signUpType: state.signUpType,
+        nationality: state.nationality,
+        city: state.city,
+        road: state.road,
+        block: state.block,
+        building: state.building,
+        addressLine1: state.addressLine1,
+        addressLine2: state.addressLine2,
+        organizationName: state.organizationName,
+        organizationRegNo: state.organizationRegNo,
+        vatNumber: state.vatNumber,
+        firstNameAr: state.firstNameAr,
+        lastNameAr: state.lastNameAr,
+        description: state.description,
       );
       emit(state.copyWith(status: SignUpStatus.success));
     } catch (error) {

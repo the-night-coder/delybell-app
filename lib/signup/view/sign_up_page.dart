@@ -46,18 +46,12 @@ class _SignUpView extends StatelessWidget {
                   SizedBox(height: 4),
                   Text(
                     'Sign Up',
-                    style: TextStyle(
-                      fontSize: 36,
-                      fontWeight: FontWeight.w700,
-                    ),
+                    style: TextStyle(fontSize: 36, fontWeight: FontWeight.w700),
                   ),
                   SizedBox(height: 8),
                   Text(
                     'Enter your details below to create a new account.',
-                    style: TextStyle(
-                      color: Color(0xFF4B5563),
-                      fontSize: 15,
-                    ),
+                    style: TextStyle(color: Color(0xFF4B5563), fontSize: 15),
                   ),
                   SizedBox(height: 32),
                   _SignUpForm(),
@@ -77,7 +71,8 @@ class _SignUpSegmentedControl extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<SignUpBloc, SignUpState>(
-      buildWhen: (previous, current) => previous.signUpType != current.signUpType,
+      buildWhen: (previous, current) =>
+          previous.signUpType != current.signUpType,
       builder: (context, state) {
         return Container(
           decoration: BoxDecoration(
@@ -89,9 +84,8 @@ class _SignUpSegmentedControl extends StatelessWidget {
               final isActive = type == state.signUpType;
               return Expanded(
                 child: GestureDetector(
-                  onTap: () => context.read<SignUpBloc>().add(
-                        SignUpTypeChanged(type),
-                      ),
+                  onTap: () =>
+                      context.read<SignUpBloc>().add(SignUpTypeChanged(type)),
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 220),
                     padding: const EdgeInsets.symmetric(vertical: 16),
@@ -116,7 +110,9 @@ class _SignUpSegmentedControl extends StatelessWidget {
                       type.title,
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        color: isActive ? Colors.white : const Color(0xFF374151),
+                        color: isActive
+                            ? Colors.white
+                            : const Color(0xFF374151),
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -147,7 +143,13 @@ class _SignUpFormState extends State<_SignUpForm> {
       listener: (context, state) {
         if (state.status == SignUpStatus.success) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Account created successfully.')),
+            SnackBar(
+              content: Text(
+                state.signUpType == SignUpType.corporate
+                    ? 'Corporate Enquiry request sent successfully!\\nOur representative will contact you soon.'
+                    : 'Account created successfully.',
+              ),
+            ),
           );
           Future.delayed(const Duration(milliseconds: 800), () {
             if (context.mounted) Navigator.of(context).pop();
@@ -174,9 +176,9 @@ class _SignUpFormState extends State<_SignUpForm> {
                       labelText: 'First Name',
                       prefixIcon: Icon(Icons.person_outline),
                     ),
-                    onChanged: (value) => context
-                        .read<SignUpBloc>()
-                        .add(SignUpFirstNameChanged(value)),
+                    onChanged: (value) => context.read<SignUpBloc>().add(
+                      SignUpFirstNameChanged(value),
+                    ),
                     validator: (value) =>
                         (value == null || value.isEmpty) ? 'Required' : null,
                   ),
@@ -188,9 +190,9 @@ class _SignUpFormState extends State<_SignUpForm> {
                       labelText: 'Last Name',
                       prefixIcon: Icon(Icons.person_outline),
                     ),
-                    onChanged: (value) => context
-                        .read<SignUpBloc>()
-                        .add(SignUpLastNameChanged(value)),
+                    onChanged: (value) => context.read<SignUpBloc>().add(
+                      SignUpLastNameChanged(value),
+                    ),
                     validator: (value) =>
                         (value == null || value.isEmpty) ? 'Required' : null,
                   ),
@@ -223,19 +225,26 @@ class _SignUpFormState extends State<_SignUpForm> {
                       width: 110,
                       child: DropdownButtonFormField<String>(
                         value: state.countryCode,
-                        decoration: const InputDecoration(
-                          labelText: 'Code',
-                        ),
+                        decoration: const InputDecoration(labelText: 'Code'),
                         items: const [
-                          DropdownMenuItem(value: '+973', child: Text('BH +973')),
-                          DropdownMenuItem(value: '+971', child: Text('AE +971')),
-                          DropdownMenuItem(value: '+966', child: Text('SA +966')),
+                          DropdownMenuItem(
+                            value: '+973',
+                            child: Text('BH +973'),
+                          ),
+                          DropdownMenuItem(
+                            value: '+971',
+                            child: Text('AE +971'),
+                          ),
+                          DropdownMenuItem(
+                            value: '+966',
+                            child: Text('SA +966'),
+                          ),
                         ],
                         onChanged: (value) {
                           if (value == null) return;
-                          context
-                              .read<SignUpBloc>()
-                              .add(SignUpCountryCodeChanged(value));
+                          context.read<SignUpBloc>().add(
+                            SignUpCountryCodeChanged(value),
+                          );
                         },
                       ),
                     ),
@@ -247,11 +256,12 @@ class _SignUpFormState extends State<_SignUpForm> {
                           prefixIcon: Icon(Icons.phone_outlined),
                         ),
                         keyboardType: TextInputType.phone,
-                        onChanged: (value) => context
-                            .read<SignUpBloc>()
-                            .add(SignUpPhoneChanged(value)),
-                        validator: (value) =>
-                            (value == null || value.isEmpty) ? 'Required' : null,
+                        onChanged: (value) => context.read<SignUpBloc>().add(
+                          SignUpPhoneChanged(value),
+                        ),
+                        validator: (value) => (value == null || value.isEmpty)
+                            ? 'Required'
+                            : null,
                       ),
                     ),
                   ],
@@ -261,66 +271,35 @@ class _SignUpFormState extends State<_SignUpForm> {
             const SizedBox(height: 20),
             BlocBuilder<SignUpBloc, SignUpState>(
               buildWhen: (previous, current) =>
-                  previous.isPasswordVisible != current.isPasswordVisible,
+                  previous.signUpType != current.signUpType,
               builder: (context, state) {
-                return TextFormField(
-                  decoration: InputDecoration(
-                    labelText: 'Password',
-                    prefixIcon: const Icon(Icons.lock_outline),
-                    suffixIcon: IconButton(
-                      onPressed: () => context
-                          .read<SignUpBloc>()
-                          .add(const SignUpPasswordVisibilityToggled()),
-                      icon: Icon(
-                        state.isPasswordVisible
-                            ? Icons.visibility
-                            : Icons.visibility_off,
+                if (state.signUpType == SignUpType.user) {
+                  return const SizedBox.shrink();
+                }
+                return Column(
+                  children: [
+                    TextFormField(
+                      decoration: const InputDecoration(
+                        labelText: 'Organization Name',
+                        prefixIcon: Icon(Icons.business_outlined),
+                      ),
+                      onChanged: (value) => context.read<SignUpBloc>().add(
+                        SignUpOrganizationNameChanged(value),
+                      ),
+                      validator: (value) =>
+                          (value == null || value.isEmpty) ? 'Required' : null,
+                    ),
+
+                    TextFormField(
+                      decoration: const InputDecoration(
+                        labelText: 'Description (Optional)',
+                      ),
+                      maxLines: 3,
+                      onChanged: (value) => context.read<SignUpBloc>().add(
+                        SignUpDescriptionChanged(value),
                       ),
                     ),
-                  ),
-                  obscureText: !state.isPasswordVisible,
-                  onChanged: (value) => context
-                      .read<SignUpBloc>()
-                      .add(SignUpPasswordChanged(value)),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) return 'Required';
-                    if (value.length < 6) {
-                      return 'Use at least 6 characters';
-                    }
-                    return null;
-                  },
-                );
-              },
-            ),
-            const SizedBox(height: 20),
-            BlocBuilder<SignUpBloc, SignUpState>(
-              buildWhen: (previous, current) =>
-                  previous.isConfirmPasswordVisible !=
-                  current.isConfirmPasswordVisible,
-              builder: (context, state) {
-                return TextFormField(
-                  decoration: InputDecoration(
-                    labelText: 'Confirm Password',
-                    prefixIcon: const Icon(Icons.lock_outline),
-                    suffixIcon: IconButton(
-                      onPressed: () => context.read<SignUpBloc>().add(
-                            const SignUpConfirmPasswordVisibilityToggled(),
-                          ),
-                      icon: Icon(
-                        state.isConfirmPasswordVisible
-                            ? Icons.visibility
-                            : Icons.visibility_off,
-                      ),
-                    ),
-                  ),
-                  obscureText: !state.isConfirmPasswordVisible,
-                  onChanged: (value) => context
-                      .read<SignUpBloc>()
-                      .add(SignUpConfirmPasswordChanged(value)),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) return 'Required';
-                    return null;
-                  },
+                  ],
                 );
               },
             ),
@@ -339,9 +318,9 @@ class _SignUpFormState extends State<_SignUpForm> {
                         ? null
                         : () {
                             if (_formKey.currentState?.validate() ?? false) {
-                              context
-                                  .read<SignUpBloc>()
-                                  .add(const SignUpSubmitted());
+                              context.read<SignUpBloc>().add(
+                                const SignUpSubmitted(),
+                              );
                             }
                           },
                     style: ElevatedButton.styleFrom(
@@ -361,8 +340,9 @@ class _SignUpFormState extends State<_SignUpForm> {
                             width: 22,
                             child: CircularProgressIndicator(
                               strokeWidth: 2.4,
-                              valueColor:
-                                  AlwaysStoppedAnimation<Color>(Colors.white),
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                Colors.white,
+                              ),
                             ),
                           )
                         : Text(state.signUpType.ctaLabel),

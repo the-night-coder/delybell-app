@@ -26,6 +26,7 @@ class OrderSummary {
     required this.codAmount,
     required this.packages,
     required this.createdAt,
+    required this.customerOrderId,
     this.isFuturePickup = false,
     this.isCod = false,
   });
@@ -56,6 +57,7 @@ class OrderSummary {
   final String codAmount;
   final List<OrderPackageSummary> packages;
   final DateTime createdAt;
+  final String customerOrderId;
   final bool isFuturePickup;
   final bool isCod;
 
@@ -166,6 +168,9 @@ class OrderSummary {
       createdAt: DateTime.tryParse(toStr(json['createdAt'])) ?? DateTime.now(),
       isFuturePickup: json['isFuturePickup'] == true ||
           toStr(json['isFuturePickup']).toLowerCase() == 'true',
+      customerOrderId: toStr(
+        json['customerInputOrderId'] ?? json['customer_input_order_id'],
+      ),
     );
   }
 }

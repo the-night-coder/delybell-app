@@ -5,6 +5,7 @@ import 'dart:io';
 import 'dart:math' as math;
 import 'dart:ui' as ui;
 
+import 'package:flutter/foundation.dart';
 import 'package:barcode/barcode.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -40,7 +41,8 @@ class _BluetoothPrintPageState extends State<BluetoothPrintPage> {
 
   @override
   void dispose() {
-    PrintBluetoothThermal.disconnect;
+    // Fire-and-forget: disconnect the printer when the page is closed.
+    unawaited(PrintBluetoothThermal.disconnect);
     super.dispose();
   }
 
@@ -393,7 +395,9 @@ class _BluetoothPrintPageState extends State<BluetoothPrintPage> {
     );
 
     final orderId = _clean(order.generatedOrderId, max: 32);
-    final custOrderId = '--------------';
+    final custOrderId = order.customerOrderId.isNotEmpty
+        ? _clean(order.customerOrderId, max: 32)
+        : '--------------';
     final packageId = _clean(pkg.generatedPackageId, max: 32);
     final deliveryCustomerName = _clean(order.receiverName, max: 48);
     final pickupCustomerName = _clean(order.pickupName.isNotEmpty ? order.pickupName : 'Unknown', max: 48);
@@ -858,12 +862,37 @@ class _BluetoothPrintPageState extends State<BluetoothPrintPage> {
     }
   }
 
+  /// Returns a short label for the type badge on the printed label.
+  /// Priority: service type abbreviation (SD / ND / EXP), with COD / RET / INV
+  /// prefix when applicable.
   String _labelType(OrderSummary order) {
-    if (order.isCod) return 'COD';
+    // Derive service-type abbreviation from the serviceType name.
+    String serviceAbbr = '';
+    final svc = order.serviceType.toLowerCase();
+    if (svc.contains('same')) {
+      serviceAbbr = 'SD';
+    } else if (svc.contains('next')) {
+      serviceAbbr = 'ND';
+    } else if (svc.contains('express')) {
+      serviceAbbr = 'EXP';
+    }
+
+    // Derive flow-type prefix.
     final flow = order.orderType.toLowerCase();
-    if (flow.contains('return')) return 'RET';
-    if (flow.contains('inventory')) return 'INV';
-    if (flow.contains('standard')) return 'PRE';
+    String prefix = '';
+    if (order.isCod) {
+      prefix = 'COD';
+    } else if (flow.contains('return')) {
+      prefix = 'RET';
+    } else if (flow.contains('inventory')) {
+      prefix = 'INV';
+    }
+
+    if (prefix.isNotEmpty && serviceAbbr.isNotEmpty) {
+      return '$prefix-$serviceAbbr';
+    }
+    if (serviceAbbr.isNotEmpty) return serviceAbbr;
+    if (prefix.isNotEmpty) return prefix;
     return 'N/A';
   }
 
